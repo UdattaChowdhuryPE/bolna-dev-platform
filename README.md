@@ -2,8 +2,6 @@
 
 **Low-code voice agent builder for ops teams**
 
-🚀 **[Live Demo](https://bolna-dev-platform.vercel.app/)**
-
 ---
 
 ## Problem Statement

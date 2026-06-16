@@ -121,7 +121,7 @@ export default function TestDialerPage({ params }: { params: Promise<{ id: strin
               </label>
               <select
                 disabled={callActive || isCalling}
-                className="w-full px-4 py-2 border border-brand-border bg-brand-bg text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-cyan disabled:opacity-50"
+                className="w-full px-4 py-2 border border-brand-border bg-brand-bg text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-cyan disabled:opacity-50 cursor-pointer"
               >
                 <option>English</option>
                 <option>Hindi</option>
