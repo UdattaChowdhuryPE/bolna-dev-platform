@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, use } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { AGENT_TEMPLATES, MOCK_AGENTS } from '@/data';
@@ -10,17 +10,17 @@ import { Save, ArrowLeft } from 'lucide-react';
 
 function SimpleWorkflowDiagram({ nodes }: { nodes: WorkflowNode[] }) {
   return (
-    <div className="bg-gray-50 p-6 rounded-lg border border-gray-200 mb-6">
-      <h3 className="font-semibold text-gray-900 mb-4">Workflow Diagram</h3>
+    <div className="bg-brand-bg p-6 rounded-lg border border-brand-border mb-6">
+      <h3 className="font-semibold text-white mb-4">Workflow Diagram</h3>
       <div className="space-y-2">
         {nodes.length === 0 ? (
-          <p className="text-gray-500 text-sm">No nodes yet</p>
+          <p className="text-brand-muted text-sm">No nodes yet</p>
         ) : (
           nodes.map((node, idx) => (
             <div key={node.id}>
-              {idx > 0 && <div className="text-center text-gray-400 text-xs py-1">↓</div>}
-              <div className="bg-white p-3 rounded border border-gray-300 text-sm">
-                <span className="font-medium capitalize">[{node.type}]</span> {node.data.label}
+              {idx > 0 && <div className="text-center text-brand-border text-xs py-1">↓</div>}
+              <div className="bg-brand-surface p-3 rounded border border-brand-border text-sm">
+                <span className="font-medium capitalize text-brand-cyan">[{node.type}]</span><span className="text-brand-teal ml-1">{node.data.label}</span>
               </div>
             </div>
           ))
@@ -30,7 +30,8 @@ function SimpleWorkflowDiagram({ nodes }: { nodes: WorkflowNode[] }) {
   );
 }
 
-export default function BuilderPage({ params }: { params: { id: string } }) {
+export default function BuilderPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
   const router = useRouter();
   const searchParams = useSearchParams();
   const templateId = searchParams.get('template');
@@ -38,7 +39,7 @@ export default function BuilderPage({ params }: { params: { id: string } }) {
   const [selectedNode, setSelectedNode] = useState<WorkflowNode | null>(null);
 
   useEffect(() => {
-    if (params.id === 'new' && templateId) {
+    if (id === 'new' && templateId) {
       const template = AGENT_TEMPLATES.find((t) => t.id === templateId);
       if (template) {
         setAgent({
@@ -54,10 +55,10 @@ export default function BuilderPage({ params }: { params: { id: string } }) {
         });
       }
     } else {
-      const existing = MOCK_AGENTS.find((a) => a.id === params.id);
+      const existing = MOCK_AGENTS.find((a) => a.id === id);
       if (existing) setAgent(existing);
     }
-  }, [params.id, templateId]);
+  }, [id, templateId]);
 
   const handleNodeUpdate = (updatedNode: WorkflowNode) => {
     if (!agent) return;
@@ -71,7 +72,7 @@ export default function BuilderPage({ params }: { params: { id: string } }) {
   if (!agent) {
     return (
       <div className="text-center py-12">
-        <p className="text-gray-600">Loading...</p>
+        <p className="text-brand-teal">Loading...</p>
       </div>
     );
   }
@@ -79,33 +80,33 @@ export default function BuilderPage({ params }: { params: { id: string } }) {
   return (
     <div>
       <div className="mb-8">
-        <Link href="/dashboard" className="text-blue-600 hover:text-blue-700 text-sm font-medium mb-4 inline-flex items-center gap-1">
+        <Link href="/dashboard" className="text-brand-cyan hover:text-brand-teal text-sm font-medium mb-4 inline-flex items-center gap-1">
           <ArrowLeft size={16} />
           Back to Dashboard
         </Link>
-        <h2 className="text-3xl font-bold text-gray-900 mb-1">{agent.name}</h2>
-        <p className="text-gray-600">Edit your agent workflow</p>
+        <h2 className="text-3xl font-bold text-white mb-1">{agent.name}</h2>
+        <p className="text-brand-teal">Edit your agent workflow</p>
       </div>
 
       <div className="grid grid-cols-3 gap-6 mb-8">
-        <div className="bg-white p-4 rounded-lg border border-gray-200">
-          <p className="text-xs text-gray-600 uppercase font-medium mb-1">Status</p>
-          <p className="text-lg font-semibold text-gray-900 capitalize">{agent.status}</p>
+        <div className="bg-brand-card p-4 rounded-lg border border-brand-border">
+          <p className="text-xs text-brand-muted uppercase font-medium mb-1">Status</p>
+          <p className="text-lg font-semibold text-white capitalize">{agent.status}</p>
         </div>
-        <div className="bg-white p-4 rounded-lg border border-gray-200">
-          <p className="text-xs text-gray-600 uppercase font-medium mb-1">Template</p>
-          <p className="text-lg font-semibold text-gray-900 capitalize">{agent.template_type.replace('_', ' ')}</p>
+        <div className="bg-brand-card p-4 rounded-lg border border-brand-border">
+          <p className="text-xs text-brand-muted uppercase font-medium mb-1">Template</p>
+          <p className="text-lg font-semibold text-white capitalize">{agent.template_type.replace('_', ' ')}</p>
         </div>
-        <div className="bg-white p-4 rounded-lg border border-gray-200">
-          <p className="text-xs text-gray-600 uppercase font-medium mb-1">Nodes</p>
-          <p className="text-lg font-semibold text-gray-900">{agent.workflow.length}</p>
+        <div className="bg-brand-card p-4 rounded-lg border border-brand-border">
+          <p className="text-xs text-brand-muted uppercase font-medium mb-1">Nodes</p>
+          <p className="text-lg font-semibold text-white">{agent.workflow.length}</p>
         </div>
       </div>
 
       <SimpleWorkflowDiagram nodes={agent.workflow} />
 
-      <div className="bg-white rounded-lg shadow p-6 mb-6">
-        <h3 className="font-semibold text-gray-900 mb-4">Workflow Nodes</h3>
+      <div className="bg-brand-card rounded-lg border border-brand-border p-6 mb-6">
+        <h3 className="font-semibold text-white mb-4">Workflow Nodes</h3>
         <div className="space-y-2">
           {agent.workflow.map((node) => (
             <button
@@ -113,12 +114,12 @@ export default function BuilderPage({ params }: { params: { id: string } }) {
               onClick={() => setSelectedNode(node)}
               className={`w-full text-left p-3 rounded-lg border-2 transition ${
                 selectedNode?.id === node.id
-                  ? 'border-blue-600 bg-blue-50'
-                  : 'border-gray-200 bg-white hover:border-gray-300'
+                  ? 'border-brand-cyan bg-brand-cyan/10'
+                  : 'border-brand-border bg-brand-surface hover:border-brand-cyan/50'
               }`}
             >
-              <span className="font-medium capitalize text-gray-900">[{node.type}]</span>
-              <span className="text-gray-600 ml-2">{node.data.label}</span>
+              <span className="font-medium capitalize text-brand-cyan">[{node.type}]</span>
+              <span className="text-brand-teal ml-2">{node.data.label}</span>
             </button>
           ))}
         </div>
@@ -127,7 +128,7 @@ export default function BuilderPage({ params }: { params: { id: string } }) {
       <div className="flex gap-3">
         <Link
           href={`/test/${agent.id}`}
-          className="flex-1 bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 px-4 rounded-lg transition text-center"
+          className="flex-1 bg-brand-purple hover:bg-brand-purple/80 text-white font-medium py-2 px-4 rounded-lg transition text-center"
         >
           Test Agent
         </Link>
