@@ -14,6 +14,7 @@ export default function TestDialerPage({ params }: { params: Promise<{ id: strin
   const [callActive, setCallActive] = useState(false);
   const [transcript, setTranscript] = useState<TranscriptEntry[]>([]);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const handleStartCall = () => {
     if (!phoneNumber) {
@@ -25,27 +26,34 @@ export default function TestDialerPage({ params }: { params: Promise<{ id: strin
     setTranscript([]);
 
     // Simulate call starting after 3 seconds
-    setTimeout(() => {
+    timeoutRef.current = setTimeout(() => {
       setIsCalling(false);
       setCallActive(true);
       // Simulate transcript appearing
       let index = 0;
       intervalRef.current = setInterval(() => {
-        if (index < MOCK_TRANSCRIPT.length) {
-          setTranscript((prev) => [...prev, MOCK_TRANSCRIPT[index]]);
+        const entry = MOCK_TRANSCRIPT[index];
+        if (entry) {
+          setTranscript((prev) => [...prev, entry]);
           index++;
         } else {
-          clearInterval(intervalRef.current);
+          clearInterval(intervalRef.current!);
+          intervalRef.current = null;
         }
       }, 500);
     }, 3000);
   };
 
   const handleEndCall = () => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
+    setTranscript([]);
     setCallActive(false);
     setIsCalling(false);
   };
@@ -144,7 +152,7 @@ export default function TestDialerPage({ params }: { params: Promise<{ id: strin
               <p className="text-brand-muted">Call transcript will appear here...</p>
             ) : (
               <div className="space-y-2">
-                {transcript.map((entry, idx) => (
+                {transcript.filter(Boolean).map((entry, idx) => (
                   <div key={idx} className="flex gap-3">
                     <span className="text-brand-muted flex-shrink-0">{entry.timestamp}</span>
                     <div>
