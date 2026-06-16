@@ -1,3 +1,25 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+:root {
+  --color-brand-bg: #001014;
+  --color-brand-surface: #0D272B;
+  --color-brand-card: #18343A;
+  --color-brand-border: #2E6B70;
+  --color-brand-cyan: #00F6FF;
+  --color-brand-purple: #693AFF;
+  --color-brand-teal: #7ED6DF;
+  --color-brand-mint: #B4EEED;
+  --color-brand-muted: #95A4A6;
+}
+
+@theme {
+  --color-brand-bg: var(--color-brand-bg);
+  --color-brand-surface: var(--color-brand-surface);
+  --color-brand-card: var(--color-brand-card);
+  --color-brand-border: var(--color-brand-border);
+  --color-brand-cyan: var(--color-brand-cyan);
+  --color-brand-purple: var(--color-brand-purple);
+  --color-brand-teal: var(--color-brand-teal);
+  --color-brand-mint: var(--color-brand-mint);
+  --color-brand-muted: var(--color-brand-muted);
+}

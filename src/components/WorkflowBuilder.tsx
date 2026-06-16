@@ -24,7 +24,7 @@ export function WorkflowBuilder({ initialNodes = [], initialEdges = [] }: { init
   }, [setEdges]);
 
   return (
-    <div className="w-full h-96 bg-gray-100 rounded-lg border border-gray-300 overflow-hidden">
+    <div className="w-full h-96 bg-brand-bg rounded-lg border border-brand-border overflow-hidden">
       <ReactFlow
         nodes={nodes}
         edges={edges}
