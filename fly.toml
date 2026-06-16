@@ -1,16 +1,12 @@
-# Fly.io configuration for Bolna Dev Platform
 app = "bolna-dev-platform"
 primary_region = "sjc"
 
 [build]
   builder = "paketobuildpacks"
-
-[build.buildpacks]
-  id = "gcr.io/paketo-buildpacks/nodejs"
+  buildpacks = ["gcr.io/paketo-buildpacks/nodejs"]
 
 [env]
   NODE_ENV = "production"
-  NODE_OPTIONS = "-—max_old_space_size=1024"
 
 [[services]]
   protocol = "tcp"
