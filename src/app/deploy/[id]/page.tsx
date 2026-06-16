@@ -31,6 +31,34 @@ export default function DeployPage({ params }: { params: Promise<{ id: string }>
     }, 2000);
   };
 
+  const handleExportConfig = () => {
+    if (!agent) return;
+    const config = {
+      "_comments": "🚀 Congratulations! Your agent config is ready to conquer the world!",
+      "_easter_egg": "You found the secret! This agent was crafted with ❤️, coffee ☕, and a sprinkle of AI magic ✨",
+      id: agent.id,
+      name: agent.name,
+      template_type: agent.template_type,
+      workflow: agent.workflow,
+      integrations: agent.integrations,
+      status: agent.status,
+      language: agent.language,
+      created_at: agent.created_at,
+      last_modified: agent.last_modified,
+    };
+    const dataStr = JSON.stringify(config, null, 2);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(dataBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${agent.name.replace(/\s+/g, '_')}_config.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    console.log('🎉 Agent config exported! Go forth and build amazing things! 🚀');
+  };
+
   if (!agent) {
     return (
       <div className="text-center py-12">
@@ -146,7 +174,9 @@ export default function DeployPage({ params }: { params: Promise<{ id: string }>
               Back to Dashboard
             </Link>
             <button
+              onClick={handleExportConfig}
               className="flex-1 flex items-center justify-center gap-2 border border-brand-border hover:bg-brand-surface text-white font-medium py-2 rounded-lg transition"
+              title="Download agent config (includes a secret message 🤫)"
             >
               <Download size={16} />
               Export Config
