@@ -1,13 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, use } from 'react';
 import Link from 'next/link';
 import { MOCK_AGENTS } from '@/data';
 import { Agent } from '@/types';
 import { CheckCircle, ArrowLeft, Download } from 'lucide-react';
 
-export default function DeployPage({ params }: { params: { id: string } }) {
-  const agent = MOCK_AGENTS.find((a) => a.id === params.id);
+export default function DeployPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
+  const agent = MOCK_AGENTS.find((a) => a.id === id);
   const [isDeploying, setIsDeploying] = useState(false);
   const [deployed, setDeployed] = useState(false);
 
