@@ -13,7 +13,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="bg-[#001014] text-white">
+      <body className="bg-[#001014] text-white" suppressHydrationWarning>
         <nav className="bg-[#0D272B] border-b border-[#2E6B70]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div className="flex justify-between items-center">
