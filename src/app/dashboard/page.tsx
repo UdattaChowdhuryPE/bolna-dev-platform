@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { MOCK_AGENTS } from '@/data';
 import { Agent } from '@/types';
-import { Plus, Edit2, Play } from 'lucide-react';
+import { Plus, Edit2, Play, Trash2 } from 'lucide-react';
+import { getAgents, deleteAgent } from '@/utils/agentStorage';
 
-function AgentCard({ agent }: { agent: Agent }) {
+function AgentCard({ agent, onDelete }: { agent: Agent; onDelete: (id: string) => void }) {
   const statusColors = {
     active: 'bg-green-900/20 text-green-400',
     draft: 'bg-yellow-900/20 text-yellow-400',
@@ -52,13 +53,35 @@ function AgentCard({ agent }: { agent: Agent }) {
           <Play size={14} />
           Test
         </Link>
+        <button
+          onClick={() => {
+            if (confirm(`Are you sure you want to delete "${agent.name}"?`)) {
+              deleteAgent(agent.id);
+              onDelete(agent.id);
+            }
+          }}
+          className="flex-1 flex items-center justify-center gap-2 bg-red-900/20 hover:bg-red-900/40 text-red-400 text-sm font-medium py-2 rounded transition border border-red-900/50"
+          title="Delete agent"
+        >
+          <Trash2 size={14} />
+        </button>
       </div>
     </div>
   );
 }
 
 export default function Dashboard() {
-  const [agents] = useState<Agent[]>(MOCK_AGENTS);
+  const [agents, setAgents] = useState<Agent[]>([]);
+
+  useEffect(() => {
+    const storedAgents = getAgents();
+    const allAgents = [...storedAgents, ...MOCK_AGENTS.filter(m => !storedAgents.find(s => s.id === m.id))];
+    setAgents(allAgents);
+  }, []);
+
+  const handleDelete = (id: string) => {
+    setAgents(agents.filter(a => a.id !== id));
+  };
 
   return (
     <div>
@@ -91,7 +114,7 @@ export default function Dashboard() {
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {agents.map((agent) => (
-            <AgentCard key={agent.id} agent={agent} />
+            <AgentCard key={agent.id} agent={agent} onDelete={handleDelete} />
           ))}
         </div>
       )}

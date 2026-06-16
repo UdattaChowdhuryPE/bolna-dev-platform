@@ -1,16 +1,27 @@
 'use client';
 
-import { useState, use } from 'react';
+import { useState, use, useEffect } from 'react';
 import Link from 'next/link';
 import { MOCK_AGENTS } from '@/data';
 import { Agent } from '@/types';
 import { CheckCircle, ArrowLeft, Download } from 'lucide-react';
+import { getAgent } from '@/utils/agentStorage';
 
 export default function DeployPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const agent = MOCK_AGENTS.find((a) => a.id === id);
+  const [agent, setAgent] = useState<Agent | null>(null);
   const [isDeploying, setIsDeploying] = useState(false);
   const [deployed, setDeployed] = useState(false);
+
+  useEffect(() => {
+    const fromStorage = getAgent(id);
+    if (fromStorage) {
+      setAgent(fromStorage);
+    } else {
+      const mock = MOCK_AGENTS.find((a) => a.id === id);
+      setAgent(mock || null);
+    }
+  }, [id]);
 
   const handleDeploy = () => {
     setIsDeploying(true);
@@ -23,7 +34,7 @@ export default function DeployPage({ params }: { params: Promise<{ id: string }>
   if (!agent) {
     return (
       <div className="text-center py-12">
-        <p className="text-brand-teal">Agent not found</p>
+        <p className="text-brand-teal">Loading agent...</p>
       </div>
     );
   }

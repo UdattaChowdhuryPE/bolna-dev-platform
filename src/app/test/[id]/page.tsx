@@ -1,20 +1,31 @@
 'use client';
 
-import { useState, useRef, use } from 'react';
+import { useState, useRef, use, useEffect } from 'react';
 import Link from 'next/link';
 import { MOCK_AGENTS, MOCK_TRANSCRIPT } from '@/data';
 import { Agent, TranscriptEntry } from '@/types';
 import { Phone, PhoneOff, ArrowLeft } from 'lucide-react';
+import { getAgent } from '@/utils/agentStorage';
 
 export default function TestDialerPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const agent = MOCK_AGENTS.find((a) => a.id === id);
+  const [agent, setAgent] = useState<Agent | null>(null);
   const [phoneNumber, setPhoneNumber] = useState('');
   const [isCalling, setIsCalling] = useState(false);
   const [callActive, setCallActive] = useState(false);
   const [transcript, setTranscript] = useState<TranscriptEntry[]>([]);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    const fromStorage = getAgent(id);
+    if (fromStorage) {
+      setAgent(fromStorage);
+    } else {
+      const mock = MOCK_AGENTS.find((a) => a.id === id);
+      setAgent(mock || null);
+    }
+  }, [id]);
 
   const handleStartCall = () => {
     if (!phoneNumber) {
@@ -61,7 +72,7 @@ export default function TestDialerPage({ params }: { params: Promise<{ id: strin
   if (!agent) {
     return (
       <div className="text-center py-12">
-        <p className="text-gray-600">Agent not found</p>
+        <p className="text-brand-teal">Loading agent...</p>
       </div>
     );
   }

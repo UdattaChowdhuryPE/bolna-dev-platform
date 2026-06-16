@@ -7,6 +7,7 @@ import { AGENT_TEMPLATES, MOCK_AGENTS } from '@/data';
 import { Agent, WorkflowNode } from '@/types';
 import { NodeEditor } from '@/components/NodeEditor';
 import { Save, ArrowLeft } from 'lucide-react';
+import { getAgent, saveAgent } from '@/utils/agentStorage';
 
 function SimpleWorkflowDiagram({ nodes }: { nodes: WorkflowNode[] }) {
   return (
@@ -42,7 +43,7 @@ export default function BuilderPage({ params }: { params: Promise<{ id: string }
     if (id === 'new' && templateId) {
       const template = AGENT_TEMPLATES.find((t) => t.id === templateId);
       if (template) {
-        setAgent({
+        const newAgent: Agent = {
           id: `agent-${Date.now()}`,
           name: `${template.name} - Copy`,
           template_type: template.type,
@@ -52,20 +53,30 @@ export default function BuilderPage({ params }: { params: Promise<{ id: string }
           created_at: new Date().toISOString().split('T')[0],
           last_modified: new Date().toISOString().split('T')[0],
           language: 'en',
-        });
+        };
+        saveAgent(newAgent);
+        setAgent(newAgent);
       }
     } else {
-      const existing = MOCK_AGENTS.find((a) => a.id === id);
-      if (existing) setAgent(existing);
+      const fromStorage = getAgent(id);
+      if (fromStorage) {
+        setAgent(fromStorage);
+      } else {
+        const existing = MOCK_AGENTS.find((a) => a.id === id);
+        if (existing) setAgent(existing);
+      }
     }
   }, [id, templateId]);
 
   const handleNodeUpdate = (updatedNode: WorkflowNode) => {
     if (!agent) return;
-    setAgent({
+    const updated = {
       ...agent,
       workflow: agent.workflow.map((n) => (n.id === updatedNode.id ? updatedNode : n)),
-    });
+      last_modified: new Date().toISOString().split('T')[0],
+    };
+    saveAgent(updated);
+    setAgent(updated);
     setSelectedNode(updatedNode);
   };
 
