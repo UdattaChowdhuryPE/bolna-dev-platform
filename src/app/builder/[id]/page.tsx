@@ -38,6 +38,8 @@ export default function BuilderPage({ params }: { params: Promise<{ id: string }
   const templateId = searchParams.get('template');
   const [agent, setAgent] = useState<Agent | null>(null);
   const [selectedNode, setSelectedNode] = useState<WorkflowNode | null>(null);
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [tempName, setTempName] = useState('');
 
   useEffect(() => {
     if (id === 'new' && templateId) {
@@ -56,14 +58,19 @@ export default function BuilderPage({ params }: { params: Promise<{ id: string }
         };
         saveAgent(newAgent);
         setAgent(newAgent);
+        setTempName(newAgent.name);
       }
     } else {
       const fromStorage = getAgent(id);
       if (fromStorage) {
         setAgent(fromStorage);
+        setTempName(fromStorage.name);
       } else {
         const existing = MOCK_AGENTS.find((a) => a.id === id);
-        if (existing) setAgent(existing);
+        if (existing) {
+          setAgent(existing);
+          setTempName(existing.name);
+        }
       }
     }
   }, [id, templateId]);
@@ -78,6 +85,22 @@ export default function BuilderPage({ params }: { params: Promise<{ id: string }
     saveAgent(updated);
     setAgent(updated);
     setSelectedNode(updatedNode);
+  };
+
+  const handleSaveName = () => {
+    if (!agent || !tempName.trim()) {
+      setTempName(agent?.name || '');
+      setIsEditingName(false);
+      return;
+    }
+    const updated = {
+      ...agent,
+      name: tempName.trim(),
+      last_modified: new Date().toISOString().split('T')[0],
+    };
+    saveAgent(updated);
+    setAgent(updated);
+    setIsEditingName(false);
   };
 
   if (!agent) {
@@ -95,7 +118,35 @@ export default function BuilderPage({ params }: { params: Promise<{ id: string }
           <ArrowLeft size={16} />
           Back to Dashboard
         </Link>
-        <h2 className="text-3xl font-bold text-white mb-1">{agent.name}</h2>
+        {isEditingName ? (
+          <div className="mb-4">
+            <input
+              type="text"
+              value={tempName}
+              onChange={(e) => setTempName(e.target.value)}
+              onBlur={handleSaveName}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleSaveName();
+                if (e.key === 'Escape') {
+                  setTempName(agent?.name || '');
+                  setIsEditingName(false);
+                }
+              }}
+              autoFocus
+              className="text-3xl font-bold text-white bg-transparent border-b-2 border-brand-cyan focus:outline-none py-1 px-0"
+            />
+          </div>
+        ) : (
+          <div
+            onClick={() => {
+              setTempName(agent?.name || '');
+              setIsEditingName(true);
+            }}
+            className="cursor-pointer hover:opacity-80 transition mb-2"
+          >
+            <h2 className="text-3xl font-bold text-white mb-1">{agent.name}</h2>
+          </div>
+        )}
         <p className="text-brand-teal">Edit your agent workflow</p>
       </div>
 
